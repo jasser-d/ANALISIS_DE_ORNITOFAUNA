@@ -1,29 +1,43 @@
 
 #calculo de diversidad 
 
-#library(asbio)
-
-
 DIVERSIDAD_ALFA<-function(base_datos){
  
   #DIVERSIDAD TOTAL DEL INVENTARIO DE ORNITOFAUNA
   
-  abund<-data.frame(rowSums(base_datos))
+  abund<-data.frame(colSums(base_datos))
   
-  SIMPSOM<-alpha.div(abund,"simp")
-  SHANNOM<-alpha.div(abund,"shan")
+  SIMPSOM<-diversity(abund,index = "simpson")
+  SHANNOM<-diversity(abund,index = "shannon")
   
-  TOTAL<-data.frame(SIMPSOM,SHANNOM)
+  MENHINICK<-length(abund)/sqrt(sum(abund))
+  
+  TOTAL<-data.frame(SIMPSOM,SHANNOM,MENHINICK)
   
   #DIVERSIDADE PARA CADA PUNTO DE OBSERVACION
+  SIMPSOM<-diversity(base_datos,index = "simpson")
+  SHANNOM<-diversity(base_datos,index = "shannon")
   
-  PARCELAS<-rbind(alpha.div(base_datos,"shan"),alpha.div(base_datos,"simp"))
-  rownames(PARCELAS)<-c("DIVERSIDAD DE SHANNON","DIVERSIDAD DE SIMPSON")
-  PARCELAS<-t(PARCELAS)
+  ciclo<-1:dim(base_datos)[1]
+  MENHINICK<-data.frame()
   
-  PARCELAS<-data.frame('PUNTO DE OBSERVACION'=row.names(PARCELAS),PARCELAS)
+  for (i in ciclo) {
+    filas<-formato_vegan_parcelas[i,]
+    filas<-filas[0!=filas]
+    total<-length(filas)/sqrt(sum(filas))  
+    if (i==1) {
+      MENHINICK<-cbind(total)
+    }
+    else{
+      MENHINICK<-cbind(MENHINICK,total)
+    }
+  }
   
+  colnames(MENHINICK)<-c(row.names(base_datos))
+  
+  PARCELAS<-rbind(PARCELAS=row.names(base_datos),SIMPSOM,SHANNOM,MENHINICK)%>%t()%>%data.frame()
+  colnames(PARCELAS)<-c("PARCELAS","SIMPSOM","SHANNOM","MENHINICK")
   indices<-list(TOTAL,PARCELAS)
-  
+  names(indices)<-c("TOTAL","PARCELAS")
   return(indices)
 }

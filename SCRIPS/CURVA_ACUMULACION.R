@@ -1,10 +1,6 @@
 #BASE_CURVAS_DE_ESPECIES
-#library(BiodiversityR)
-#library(vegan)
-#library("DT")
 
-
-modelos_de_curvas_de_acumulacion<-function(FORMATO_DIVERSIDAD_VEGAN,PERMUTACIONES){
+modelos_de_curvas_de_acumulacion<-function(FORMATO_DIVERSIDAD_VEGAN,PERMUTACIONES=100){
   
   curva_desc<-specaccum(FORMATO_DIVERSIDAD_VEGAN,method = "collector")
   
